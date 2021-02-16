@@ -31,7 +31,7 @@ reporting_codes = [v for v in utils._get_reporting_codes().values() \
                    if v not in ['all',0,841]]
 
 # where to save data
-save_dir = '~/uncomtrade'
+save_dir = 'data_prep/raw_data'
 
 # the commodity code to download
 hs_code = 1201 # TOTAL, 120110
