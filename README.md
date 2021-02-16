@@ -3,4 +3,4 @@ Artificial Intelligence Network Explanation of Trade (AINET)
 
 
 ## Alternative Modeling
-*alt_ols_arima.R
+* alt_ols_arima.R
