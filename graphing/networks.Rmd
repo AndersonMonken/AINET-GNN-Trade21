@@ -1,0 +1,155 @@
+---
+title: "Networks Graph"
+author: "Anderson Monken"
+date: "11/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+
+# libraries and reticulate setup
+library(pacman)
+p_load(tidyverse)
+Sys.setenv(RETICULATE_PYTHON = '/opt/local/bin/python3')
+Sys.setenv(python = '/opt/local/bin/python3')
+library(reticulate)
+use_python('/opt/local/bin/python3', required = TRUE)
+py_config()
+p_load(htmltools)
+p_load(tidygraph)
+p_load(ggraph)
+py_run_string("import os as os")
+```
+
+
+```{python}
+# grab the data and set it up for R
+import pickle
+obj = pickle.load(open('../data/graph_data.pkl','rb'))
+
+def periods_list():
+    return [x['period'] for x in obj.values()]
+
+def provide_year_data(period):
+    data_interest = [obj[x] for x in obj.keys() if obj[x]['period'] == period][0]
+    return data_interest['node_df'], data_interest['edge_df']
+
+```
+
+```{r}
+# function to define the layout of the network
+make_layout <- function(X, type_graph){
+    combined <- py$provide_year_data(X)
+    node_df <- combined[[1]] %>% rename(name = rtTitle)
+    if (type_graph == 'focus'){
+        node_df <- node_df %>% filter(name %in% country_focus_list)
+        }
+    edge_df <- combined[[2]]
+    
+    node_list <- node_df$name
+    edge_info <- edge_df %>% select(target = ptTitle, source = rtTitle, TradeValue) %>% 
+        filter((target %in% node_list) & (source %in% node_list)) %>%
+        mutate(source_node = source,
+               sqrt_trade = sqrt(TradeValue),
+               log_trade = log(TradeValue))
+    
+    # make graph object using tidygraph
+    graph_df <- as_tbl_graph(edge_info, directed = TRUE, nodes = node_df, node_key = rtTitle)
+    
+    graph_df <- graph_df %>% activate(nodes) %>% left_join(node_df)
+    layout <- create_layout(graph_df, layout = 'kk')
+    return(layout)
+}
+
+# countries to include in focused network graph
+country_focus_list <- c('China','UK','USA','Brazil','Germany','Canada',
+                        'France','Japan','Indonesia','India','Australia','Italy')
+
+# get base layout to apply to all months of data
+base_layout_full <- make_layout(201704,'full') %>% select(name, x, y)
+base_layout_focus <- make_layout(201410,'focus') %>% select(name, x, y)
+
+# create graph
+make_graph <- function(X, type_graph, height, width){
+    combined <- py$provide_year_data(X)
+    node_df <- combined[[1]] %>% rename(name = rtTitle)
+    edge_df <- combined[[2]]
+    if (type_graph == 'focus'){
+        node_df <- node_df %>% filter(name %in% country_focus_list)
+        layout <- base_layout_focus
+    }else{
+        layout <- base_layout_full
+    }
+    
+    
+    
+    node_list <- node_df$name
+    edge_info <- edge_df %>% select(target = ptTitle, source = rtTitle, TradeValue) %>% 
+        filter((target %in% node_list) & (source %in% node_list)) %>%
+        mutate(source_node = source,
+               sqrt_trade = sqrt(TradeValue),
+               log_trade = log(TradeValue))
+    
+    # make graph object using tidygraph
+    graph_df <- as_tbl_graph(edge_info, directed = TRUE, nodes = node_df, node_key = rtTitle)
+    
+    node_df <- node_df %>% left_join(layout)
+    graph_df <- graph_df %>% activate(nodes) %>% left_join(node_df)
+    
+    
+    # start graph and establish layout
+    plot <- ggraph(graph_df, x = graph_df %>% activate(nodes) %>% pull(x), y = graph_df %>% activate(nodes) %>% pull(y)) +
+        
+        # add edges with width, color aesthetic attributes plus other static ones
+        geom_edge_arc(aes(width = sqrt_trade, alpha = sqrt_trade),
+                       color = 'blue',
+                       arrow = arrow(type = "closed", length = unit(2, 'mm')),
+                       strength = 0.3) + 
+        
+        # add node point and text
+        geom_node_point(aes(x = x, y = y, size = NetWeight), color = 'red') +
+        geom_node_text(aes(label = name), repel = TRUE) +
+        
+        # # name width variable on legend
+        scale_edge_width(limits = c(0, 65000)) +
+        scale_edge_alpha(limits = c(0, 65000)) +
+        # # name color variable on legend
+        # scale_edge_color_discrete(name = 'Origin State') +
+        scale_size_continuous(limits = c(0, 12500000000)) + 
+        scale_color_viridis('inferno', limits = c(0, 6)) + 
+        # graph title
+        #ggtitle(paste('Network graph for',X)) +
+        #scale_y_continuous(expand=c(0.03,0.03)) +
+        #scale_x_continuous(expand=c(0.03,0.03)) + 
+        # remove panel background and adjust title
+        theme(panel.background = element_blank(),
+              plot.title = element_text(hjust = 0.5),
+              legend.position = "none")
+    
+    ggsave(paste0('networks/',type_graph,'/',X,type_graph,'.png'), plot, height = height, width = width)
+}
+```
+
+```{r, fig.width = 4, fig.height = 2.5}
+# loop through months for focused graph
+list_periods <- py$periods_list()
+
+for (i in list_periods){
+    #make_graph(i,'full')
+    make_graph(i,'focus')
+}
+
+```
+
+```{r, fig.width = 4.25, fig.height = 3.75}
+# loop through months for full graph
+list_periods <- py$periods_list()
+
+for (i in list_periods){
+    make_graph(201710,'full', 3.1, 4.7)
+    #make_graph(i,'focus')
+}
+```
+
