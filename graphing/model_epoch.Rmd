@@ -1,0 +1,34 @@
+---
+title: "Test Performance"
+author: "Anderson Monken"
+date: "2/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+# read in data
+df <- read_csv('../gnn_modeling/model_train_performance.csv')
+
+# set up data to only include first 250 epochs and rename legend
+df_long <- df %>% select(-X1) %>% filter(epoch <=250) %>% rename(`S-GC-LSTM Test RMSE` = test_rmse,
+                              `S-GC-LSTM Train RMSE` = train_rmse) %>% 
+    pivot_longer(-epoch) %>% rename(`Model Performance` = name)
+```
+
+
+```{r}
+# plot epoch graph
+epoch_plot <- ggplot(data = df_long, aes( x = epoch, y = value, color = `Model Performance`)) + 
+  geom_line() + xlab("Model Epoch") + ylab("Model RMSE") + theme_light() +
+    theme(legend.position = c(0.73, 0.77),
+          legend.background=element_blank(),
+          legend.key=element_blank(),
+          legend.title = element_blank()) # + scale_color_manual(values = my_colors)
+ggsave('model_epoch.png',epoch_plot, height = 1.75, width = 4)
+
+```

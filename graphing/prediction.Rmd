@@ -1,0 +1,134 @@
+---
+title: "Prediction"
+author: "Anderson Monken"
+date: "2/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+df <- read_csv('../gnn_modeling/model_prediction.csv') %>% select(-X1)
+
+# set countries for prediction graph
+country_list <- c('USA','France','China','Overall Mean')
+
+# make aggregate values
+df_combined <- df %>% group_by(date, type) %>% summarize(val = mean(val))
+df_combined <- df_combined %>% mutate(country = 'Overall Mean')
+
+# add combined as a new group in main dataset
+df <- rbind(df, df_combined)
+
+# plot overall aggregate
+ggplot(data = df_combined, aes(x = date, y = val, color = type)) + geom_line()
+
+# only keep selected countries and reorder countries so mean is last
+df_country <- df %>% filter(country %in% country_list) %>% mutate(country = fct_relevel(country, 'Overall Mean', after = Inf))
+                                                                      
+```
+
+
+```{r, fig.width = 6, fig.height = 4.25}
+# plot main prediction plot
+prediction_plot <- ggplot(data = df_country, aes( x = date, y = val, color = type)) + 
+  geom_line() + ylab("TUV") + xlab(NULL) + theme_light() +
+    scale_y_continuous(limits = c(0.25,1.05), breaks = c(0.25,0.5,0.75,1)) +
+    theme(legend.position = 'none',#c(0.22, 0.92),
+          legend.title = element_blank(),
+          legend.background=element_blank(),
+          legend.key=element_blank(),
+          legend.key.size = unit(0.35, "cm")) + facet_wrap(~country, nrow = 2)# + scale_color_manual(values = my_colors)
+ggsave('model_prediction.png',prediction_plot, height = 2.4, width = 3.4)
+
+```
+
+```{r, fig.width = 4, fig.height = 6}
+# plot all ocuntries plots for review
+for (i in df$country %>% unique()){
+prediction_plot <- ggplot(data = df %>% filter(country == i), aes( x = date, y = val, color = type)) + 
+  geom_line() + ylab("TUV") + xlab(NULL) + theme_light() +
+    theme(legend.position = c(0.52, 0.94),
+          legend.title = element_blank(),
+          legend.background=element_blank(),
+          legend.key=element_blank(),
+          legend.key.size = unit(0.35, "cm")) #+ facet_wrap(~country, nrow = 3)# + scale_color_manual(values = my_colors)
+ggsave(paste0('countries/s-lstm_model_prediction_',i,'.png'),prediction_plot, height = 4, width = 3.3)
+}
+```
+
+
+```{r}
+# reorder data and construct framework for model errors
+df %>% 
+  pivot_wider(names_from=type, values_from=val) %>%
+  summary(actual)
+
+# RMSE, MAE, MAPE losses table
+library(lubridate)
+df_yearly <- df %>% 
+  pivot_wider(names_from=type, values_from=val) %>%
+  filter(country != 'Overall Mean') %>%
+  group_by(year(date)) %>%
+  summarize(train_mape = mean(abs(actual - `train-predict`)/actual, na.rm = TRUE),
+         test_mape = mean(abs(actual - `test-predict`)/actual, na.rm = TRUE),
+         train_rmse = sqrt(mean((actual - `train-predict`)**2, na.rm = TRUE)),
+         test_rmse = sqrt(mean((actual - `test-predict`)**2, na.rm = TRUE)),
+         train_mse = mean((actual - `train-predict`)**2, na.rm = TRUE),
+         test_mse = mean((actual - `test-predict`)**2, na.rm = TRUE),
+         train_mae = mean(abs(actual - `train-predict`), na.rm = TRUE),
+         test_mae = mean(abs(actual - `test-predict`), na.rm = TRUE))
+  
+df_country <- df %>% 
+  pivot_wider(names_from=type, values_from=val) %>%
+  group_by(country) %>%
+  summarize(train_mape = mean(abs(actual - `train-predict`)/actual, na.rm = TRUE),
+         test_mape = mean(abs(actual - `test-predict`)/actual, na.rm = TRUE),
+         train_rmse = sqrt(mean((actual - `train-predict`)**2, na.rm = TRUE)),
+         test_rmse = sqrt(mean((actual - `test-predict`)**2, na.rm = TRUE)),
+         train_mse = mean((actual - `train-predict`)**2, na.rm = TRUE),
+         test_mse = mean((actual - `test-predict`)**2, na.rm = TRUE),
+         train_mae = mean(abs(actual - `train-predict`), na.rm = TRUE),
+         test_mae = mean(abs(actual - `test-predict`), na.rm = TRUE))
+                                                                           
+df_country_yearly <- df %>% 
+  pivot_wider(names_from=type, values_from=val) %>%
+  group_by(country, year(date)) %>%
+  summarize(train_mape = mean(abs(actual - `train-predict`)/actual, na.rm = TRUE),
+         test_mape = mean(abs(actual - `test-predict`)/actual, na.rm = TRUE),
+         train_rmse = sqrt(mean((actual - `train-predict`)**2, na.rm = TRUE)),
+         test_rmse = sqrt(mean((actual - `test-predict`)**2, na.rm = TRUE)),
+         train_mse = mean((actual - `train-predict`)**2, na.rm = TRUE),
+         test_mse = mean((actual - `test-predict`)**2, na.rm = TRUE),
+         train_mae = mean(abs(actual - `train-predict`), na.rm = TRUE),
+         test_mae = mean(abs(actual - `test-predict`), na.rm = TRUE))
+
+write_csv(df_yearly, 'yearly_losses.csv')
+write_csv(df_country, 'country_losses.csv')
+write_csv(df_country_yearly, 'country_yearly_losses.csv')
+                                                                                          
+```
+
+```{r}
+# make smaller data for table 1
+table_country_list <- c('USA','Australia','Brazil','Canada','China','France','Germany','India','Indonesia','Italy','Japan','UK')
+
+df_table_country <- df %>% 
+  pivot_wider(names_from=type, values_from=val) %>%
+  rename(Country = country) %>%
+  filter(Country %in% table_country_list) %>%
+  group_by(Country) %>%
+  summarize(`Training MAPE` = mean(abs(actual - `train-predict`)/actual, na.rm = TRUE),
+         `Test MAPE` = mean(abs(actual - `test-predict`)/actual, na.rm = TRUE),
+         `Train RMSE` = sqrt(mean((actual - `train-predict`)**2, na.rm = TRUE)),
+         `Test RMSE` = sqrt(mean((actual - `test-predict`)**2, na.rm = TRUE))) %>%
+  mutate(Country = fct_relevel(Country, table_country_list)) %>% arrange(Country)
+
+library(xtable)
+print(xtable::xtable(df_table_country, digits=3), include.rownames=FALSE)
+```
+
+                                                                           
