@@ -13,3 +13,13 @@ ARIMA and OLS models are created using the UN comtrade data. Individual ARIMA(0,
 
 Files
 * alt_modeling/alt_ols_arima.R
+
+## Graphing
+
+Files
+* 
+
+## Modeling
+
+Files
+* 
