@@ -12,21 +12,21 @@ Files
 
 Node data summary of 5,568 observations:
 
-Variable|Trade Value | Net Weight | TUV (lead 1 month)
-----------------|---------------| ---------- | ----------
-Min | 4.6e1 | 5.0e1 | 0.00
-Mean | 6.9e7 | 1.6e8 | 0.62
-Median | 4.2e6 | 9.4e6 | 0.50
-Max | 4.4e9 | 1.2e10 | 20.51
+Variable|Trade Value | Net Weight | TUV (lead 1 month) | Edge Connections
+----------------|---------------| ---------- | ---------- | --------
+Min | 4.6e1 | 5.0e1 | 0.00 | 1
+Mean | 6.9e7 | 1.6e8 | 0.62 | 8.2
+Median | 4.2e6 | 9.4e6 | 0.50 | 5
+Max | 4.4e9 | 1.2e10 | 20.51 | 36
 
 Edge data summary of 40,162 observations:
 
-Variable| Trade Value | Net Weight | Edge Connections
-----------------|---------------| ---------- | --------
-Min | 1.0e0 | 5.0e1 | 1
-Mean | 8.4e6 | 1.9e7 | 8.2
-Median | 3.2e4 | 3.7e4 | 5
-Max | 4.0e9 | 1.2e10 | 36
+Variable| Trade Value | Net Weight
+----------------|---------------| ----------
+Min | 1.0e0 | 5.0e1
+Mean | 8.4e6 | 1.9e7
+Median | 3.2e4 | 3.7e4
+Max | 4.0e9 | 1.2e10
 
 
 ## Alternative Modeling
