@@ -10,6 +10,24 @@ Files
 
 ## Data Statistics
 
+Node data summary of 5,568 observations:
+
+Variable|Trade Value | Net Weight | TUV (lead 1 month)
+----------------|---------------| ---------- | ----------
+Min | 4.6e1 | 5.0e1 | 0.00
+Mean | 6.9e7 | 1.6e8 | 0.62
+Median | 4.2e6 | 9.4e6 | 0.50
+Max | 4.4e9 | 1.2e10 | 20.51
+
+Edge data summary of 40,162 observations:
+
+Variable| Trade Value | Net Weight | Edge Connections
+----------------|---------------| ---------- | --------
+Min | 1.0e0 | 5.0e1 | 1
+Mean | 8.4e6 | 1.9e7 | 8.2
+Median | 3.2e4 | 3.7e4 | 5
+Max | 4.0e9 | 1.2e10 | 36
+
 
 ## Alternative Modeling
 ARIMA and OLS models are created using the UN comtrade data. Individual ARIMA(0,1,1) models are ran for each country, forecasting soybean trade-unit-value forward 1, 6, and 24 months forward. A preliminary parametric OLS model is created using all node and edge features. RMSE is calculated to measure performance.
