@@ -53,7 +53,7 @@ Files
 * graphing/networks.Rmd
 
 ## GNN Modeling
-Both the stateless graph convolutional long short term memory model (S-GC-LSTM) and the graph convolutionl long short term memory model (GC-LSTM) training and prediction are provided in the jupyter notebooks. The S-GC-LSTM model is the model selected as the method of choice, and the metrics based on this model are provided in the csvs for the prediction and training performance.
+Both the stateless graph convolutional long short term memory model (S-GC-LSTM) and the graph convolutionl long short term memory model (GC-LSTM) training and prediction are provided in jupyter notebooks. The S-GC-LSTM model is the model selected as the method of choice, and the metrics based on this model are provided in the csvs for the prediction and training performance. Based on standard practice, hyperparameters of learning rate, weight decay, filter size (K), dropout rate, and activation function are tuned using grid search to identify the best performing model.
 
 Files
 * gnn_modeling/temporal-gc-lstm.ipynb
