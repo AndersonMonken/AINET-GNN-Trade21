@@ -36,6 +36,8 @@ ARIMA(0,1,1) models were selected to standardize the model across countries. We 
 
 The OLS model is a fixed effects regression controlling for time, country, and trading partner information. It also includes interaction terms of trading value and trade weight to account for their relationship with the TUV dependent variable. The final parametric equation was selected after some robust checks. The core equation was comprised of a model showing the relationship between TUV and trade. To improve the model, trade partner information was added to account for top trading partner's and their influence on TUV. This final OLS model that includes time, country, and trading partner information had the best performance and also better predictability compared to the GNN framework for both the train and test dataset.
 
+An important note about the OLS and ARIMA test environment is not the same. OLS takes data at time t and predicting t+1, while changing model parameters as it uses a test dataset. However, ARIMA does not change parameters, it is actually using data at time t and forecasting out to n time periods as t+n. This important distinction assists in contexualizing the performance of the OLS and ARIMA RMSE results to the GNN.
+
 The RMSE performance for ARIMA and OLS
 | Train | OLS      | ARIMA    |   | Test | OLS      | ARIMA    |
 |-------|----------|----------|---|------|----------|----------|
