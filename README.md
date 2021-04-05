@@ -39,7 +39,11 @@ The OLS parametric equation is below. It is a fixed effects regression controlli
 (include png for equation)
 
 The RMSE performance for ARIMA and OLS
-(include table for RMSE)
+| Train | OLS      | ARIMA    |   | Test | OLS      | ARIMA    |
+|-------|----------|----------|---|------|----------|----------|
+| 6     | 0.186964 | 0.149483 |   | 6    | 0.225325 | 0.149483 |
+| 12    | 0.181466 | 0.202305 |   | 12   | 0.240856 | 0.202305 |
+| 24    | 0.160303 | 0.23752  |   | 24   | 0.259472 | 0.23752  |
 
 Files
 * alt_modeling/alt_ols_arima.R
