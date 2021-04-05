@@ -39,7 +39,7 @@ The OLS model is a fixed effects regression controlling for time, country, and t
 The RMSE performance for ARIMA and OLS
 | Train | OLS      | ARIMA    |   | Test | OLS      | ARIMA    |
 |-------|----------|----------|---|------|----------|----------|
-| 6     | 0.186964 | 0.149483 |   | 6    | 0.225325 | 0.149483 |
+| 6     | 0.186964 | 0.19826  |   | 6    | 0.225325 | 0.149483 |
 | 12    | 0.181466 | 0.202305 |   | 12   | 0.240856 | 0.250507 |
 | 24    | 0.160303 | 0.23752  |   | 24   | 0.259472 | 0.443633 |
 
