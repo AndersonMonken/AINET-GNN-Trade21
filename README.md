@@ -36,14 +36,12 @@ ARIMA(0,1,1) models were selected to standardize the model across countries. We 
 
 The OLS parametric equation is below. It is a fixed effects regression controlling for time, country, and trading partner information. It also includes interaction terms of trading value and trade weight to account for their relationship with the TUV dependent variable. The final parametric equation was selected after some robust checks. The core equation was comprised of a model showing the relationship between TUV and trade. To improve the model, trade partner information was added to account for top trading partner's and their influence on TUV. This final OLS model that includes time, country, and trading partner information had the best performance and also better predictability compared to the GNN framework for both the train and test dataset.
 
-(include png for equation)
-
 The RMSE performance for ARIMA and OLS
 | Train | OLS      | ARIMA    |   | Test | OLS      | ARIMA    |
 |-------|----------|----------|---|------|----------|----------|
 | 6     | 0.186964 | 0.149483 |   | 6    | 0.225325 | 0.149483 |
-| 12    | 0.181466 | 0.202305 |   | 12   | 0.240856 | 0.202305 |
-| 24    | 0.160303 | 0.23752  |   | 24   | 0.259472 | 0.23752  |
+| 12    | 0.181466 | 0.202305 |   | 12   | 0.240856 | 0.250507 |
+| 24    | 0.160303 | 0.23752  |   | 24   | 0.259472 | 0.443633 |
 
 Files
 * alt_modeling/alt_ols_arima.R
